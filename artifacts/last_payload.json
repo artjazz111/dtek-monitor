@@ -251,10 +251,10 @@
         "cek": null
       },
       "56": {
-        "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:35 16.10.2026",
-        "type": "2",
+        "sub_type": "",
+        "start_date": "",
+        "end_date": "",
+        "type": "",
         "sub_type_reason": [
           "GPV35.1"
         ],
@@ -273,10 +273,10 @@
         "cek": null
       },
       "58": {
-        "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:35 16.10.2026",
-        "type": "2",
+        "sub_type": "",
+        "start_date": "",
+        "end_date": "",
+        "type": "",
         "sub_type_reason": [
           "GPV35.1"
         ],
@@ -415,22 +415,10 @@
         "voluntarily": null,
         "cek": null
       },
-      "48/А": {
-        "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:37 16.10.2026",
-        "type": "2",
-        "sub_type_reason": [
-          "GPV29.1",
-          "GPV35.1"
-        ],
-        "voluntarily": null,
-        "cek": null
-      },
       "46/1": {
         "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:37 16.10.2026",
+        "start_date": "11:10 16.10.2026",
+        "end_date": "15:36 16.10.2026",
         "type": "2",
         "sub_type_reason": [
           "GPV29.1",
@@ -527,50 +515,6 @@
         "voluntarily": null,
         "cek": null
       },
-      "58А": {
-        "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:35 16.10.2026",
-        "type": "2",
-        "sub_type_reason": [
-          "GPV35.1"
-        ],
-        "voluntarily": null,
-        "cek": null
-      },
-      "60/А": {
-        "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:35 16.10.2026",
-        "type": "2",
-        "sub_type_reason": [
-          "GPV35.1"
-        ],
-        "voluntarily": null,
-        "cek": null
-      },
-      "60/5": {
-        "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:35 16.10.2026",
-        "type": "2",
-        "sub_type_reason": [
-          "GPV35.1"
-        ],
-        "voluntarily": null,
-        "cek": null
-      },
-      "83/А": {
-        "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
-        "start_date": "11:09 16.10.2026",
-        "end_date": "15:35 16.10.2026",
-        "type": "2",
-        "sub_type_reason": [
-          "GPV35.1"
-        ],
-        "voluntarily": null,
-        "cek": null
-      },
       "50/2": {
         "sub_type": "Екстренні відключення (Аварійне без застосування графіку погодинних відключень)",
         "start_date": "11:10 16.10.2026",
@@ -604,6 +548,17 @@
         "voluntarily": null,
         "cek": null
       },
+      "60/5": {
+        "sub_type": "",
+        "start_date": "",
+        "end_date": "",
+        "type": "",
+        "sub_type_reason": [
+          "GPV35.1"
+        ],
+        "voluntarily": null,
+        "cek": null
+      },
       "54/А": {
         "sub_type": "",
         "start_date": "",
@@ -627,7 +582,30 @@
         "voluntarily": null,
         "cek": null
       },
+      "48/А": {
+        "sub_type": "",
+        "start_date": "",
+        "end_date": "",
+        "type": "",
+        "sub_type_reason": [
+          "GPV29.1",
+          "GPV35.1"
+        ],
+        "voluntarily": null,
+        "cek": null
+      },
       "85Б": {
+        "sub_type": "",
+        "start_date": "",
+        "end_date": "",
+        "type": "",
+        "sub_type_reason": [
+          "GPV35.1"
+        ],
+        "voluntarily": null,
+        "cek": null
+      },
+      "83/А": {
         "sub_type": "",
         "start_date": "",
         "end_date": "",
@@ -783,6 +761,28 @@
         "cek": null
       },
       "73/Е": {
+        "sub_type": "",
+        "start_date": "",
+        "end_date": "",
+        "type": "",
+        "sub_type_reason": [
+          "GPV35.1"
+        ],
+        "voluntarily": null,
+        "cek": null
+      },
+      "60/А": {
+        "sub_type": "",
+        "start_date": "",
+        "end_date": "",
+        "type": "",
+        "sub_type_reason": [
+          "GPV35.1"
+        ],
+        "voluntarily": null,
+        "cek": null
+      },
+      "58А": {
         "sub_type": "",
         "start_date": "",
         "end_date": "",
@@ -1108,7 +1108,7 @@
     "showTablePlan": false,
     "showTableFact": true,
     "showUserGroup": false,
-    "updateTimestamp": "12:02 16.10.2026",
+    "updateTimestamp": "12:49 16.10.2026",
     "fact": {
       "data": {
         "1792098000": {
