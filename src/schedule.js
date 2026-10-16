@@ -67,6 +67,33 @@ function summarize(groups) {
   return parts.join("; ");
 }
 
+// Інтервали "без світла" (усі черги разом, суміжні злиті), що ще не скінчились:
+// "start-end,start-end" у unix-секундах. Влазить у input_text HA (255 символів).
+function offIntervalsString(days, now) {
+  const nowSec = Math.floor(now.getTime() / 1000);
+  const spans = days
+    .flatMap((d) => Object.values(d.groups).flat())
+    .filter((i) => i.type === "off")
+    .map((i) => [Date.parse(i.start) / 1000, Date.parse(i.end) / 1000])
+    .filter(([, end]) => end > nowSec)
+    .sort((a, b) => a[0] - b[0]);
+
+  const merged = [];
+  for (const [start, end] of spans) {
+    const last = merged.at(-1);
+    if (last && start <= last[1]) last[1] = Math.max(last[1], end);
+    else merged.push([start, end]);
+  }
+
+  let out = "";
+  for (const [start, end] of merged) {
+    const part = `${out ? "," : ""}${start}-${end}`;
+    if (out.length + part.length > 255) break;
+    out += part;
+  }
+  return out;
+}
+
 // groupOverride (напр. "35.1") — якщо будинок у кількох чергах, а фактично діє одна
 export function buildSchedule(info, house, now = new Date(), groupOverride = "") {
   const houseData = info?.data?.[house];
@@ -106,6 +133,7 @@ export function buildSchedule(info, house, now = new Date(), groupOverride = "")
 
   return {
     groups: groupIds.map((g) => g.replace("GPV", "")),
+    intervals: offIntervalsString(days, now),
     updated: info.fact.update || "",
     today: today?.summary || "",
     tomorrow: tomorrow ? `${tomorrow.date} — ${tomorrow.summary}` : "",

@@ -406,6 +406,14 @@ async function run() {
   // await sendNotification("✅ TEST: runner + telegram работают");
 
   const info = await getInfo();
+
+  // Збій сайту або немає даних по будинку — не шлемо в HA "normal",
+  // інакше HA вирішить, що ДТЕК зняв аварію, а наступний запуск дасть "нову"
+  if (!info || info.result === false || !info?.data || !HOUSE || !info.data[HOUSE]) {
+    console.log("⚠️ No valid DTEK data, skipping Home Assistant update");
+    return;
+  }
+
   const isOutage = checkIsOutage(info);
   const isScheduled = checkIsScheduled(info);
 
