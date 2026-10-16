@@ -14,11 +14,32 @@ const SLOT_STATES = {
   msecond: ["on", "maybe"],
 };
 
-function formatTime(sec, dayStart) {
-  const m = Math.round((sec - dayStart) / 60);
+function formatMinutes(m) {
   const hh = String(Math.floor(m / 60)).padStart(2, "0");
   const mm = String(m % 60).padStart(2, "0");
   return `${hh}:${mm}`;
+}
+
+const offsetFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Europe/Kyiv",
+  timeZoneName: "longOffset",
+});
+
+// Зсув Києва від UTC у секундах на момент sec (+10800 влітку, +7200 взимку)
+function kyivOffset(sec) {
+  const name = offsetFormat
+    .formatToParts(new Date(sec * 1000))
+    .find((p) => p.type === "timeZoneName").value; // "GMT+03:00"
+  const [, sign, hh, mm] = name.match(/GMT([+-])(\d{2}):(\d{2})/) || [null, "+", "00", "00"];
+  return (sign === "-" ? -1 : 1) * (Number(hh) * 3600 + Number(mm) * 60);
+}
+
+// Київський настінний час (хвилини від півночі) → unix-секунди.
+// Колонки ДТЕК — це години за годинником, тож у дні переходу на літній/зимовий
+// час доба має 23/25 год, і просте dayStart + хвилини зсунуло б усе на годину.
+function wallToEpoch(dayStart, minutes) {
+  const guess = dayStart + minutes * 60;
+  return guess + kyivOffset(dayStart) - kyivOffset(guess);
 }
 
 function formatDate(dayStart) {
@@ -46,13 +67,13 @@ function groupIntervals(row, dayStart) {
   }
 
   return intervals.map(({ type, startSlot, endSlot }) => {
-    const start = dayStart + startSlot * SLOT_SEC;
-    const end = dayStart + endSlot * SLOT_SEC;
+    const startMin = (startSlot * SLOT_SEC) / 60;
+    const endMin = (endSlot * SLOT_SEC) / 60;
     return {
       type,
-      start: new Date(start * 1000).toISOString(),
-      end: new Date(end * 1000).toISOString(),
-      text: `${formatTime(start, dayStart)}–${formatTime(end, dayStart)}`,
+      start: new Date(wallToEpoch(dayStart, startMin) * 1000).toISOString(),
+      end: new Date(wallToEpoch(dayStart, endMin) * 1000).toISOString(),
+      text: `${formatMinutes(startMin)}–${formatMinutes(endMin)}`,
     };
   });
 }
