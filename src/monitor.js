@@ -10,7 +10,10 @@ import {
   HOUSE,
   SHUTDOWNS_PAGE,
   HA_WEBHOOK_URL,
+  GROUP,
 } from "./constants.js";
+
+import { buildSchedule } from "./schedule.js";
 
 import {
   capitalize,
@@ -354,7 +357,7 @@ async function sendTimeChangeNotification(newEndDate) {
   }
 }
 
-async function sendToHomeAssistant(outageInfo, isActive) {
+async function sendToHomeAssistant(outageInfo, isActive, info) {
   if (!HA_WEBHOOK_URL) {
     console.log("ℹ️ HA_WEBHOOK_URL not configured, skipping Home Assistant notification");
     return;
@@ -375,7 +378,8 @@ async function sendToHomeAssistant(outageInfo, isActive) {
           end_date: outageInfo.end_date,
           reason: outageInfo.sub_type,
         }
-      })
+      }),
+      schedule: buildSchedule(info, HOUSE, new Date(), GROUP),
     };
 
     const response = await fetch(HA_WEBHOOK_URL, {
@@ -419,14 +423,14 @@ async function run() {
     await sendNotification(message, outageInfo);
 
     // Отправляем данные в Home Assistant
-    await sendToHomeAssistant(outageInfo, true);
+    await sendToHomeAssistant(outageInfo, true, info);
   } else {
     console.log("ℹ️ No notification needed.");
     // Удаляем информацию о последнем сообщении когда отключения нет
     deleteLastMessage();
 
     // Уведомляем Home Assistant что отключения нет
-    await sendToHomeAssistant(null, false);
+    await sendToHomeAssistant(null, false, info);
   }
 }
 

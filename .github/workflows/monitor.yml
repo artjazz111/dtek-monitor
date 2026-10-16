@@ -49,6 +49,7 @@ jobs:
           STREET: ${{ secrets.STREET }}
           HOUSE: ${{ secrets.HOUSE }}
           HA_WEBHOOK_URL: ${{ secrets.HA_WEBHOOK_URL }}
+          GROUP: ${{ vars.GROUP }}
         run: node ./src/monitor.js
 
       - name: Commit updated artifacts
