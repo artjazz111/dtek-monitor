@@ -270,8 +270,11 @@ function generateMessage(info) {
 }
 
 async function sendNotification(message, outageInfo) {
-  if (!TELEGRAM_BOT_TOKEN) throw Error("❌ Missing telegram bot token.");
-  if (!TELEGRAM_CHAT_ID) throw Error("❌ Missing telegram chat id.");
+  // Telegram необов'язковий: повідомлення може слати Home Assistant з вебхука
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.log("ℹ️ Telegram not configured, skipping notification");
+    return;
+  }
 
   console.log("🌀 Sending notification...");
 
