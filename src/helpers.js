@@ -3,17 +3,19 @@ import path from "node:path"
 
 import { LAST_MESSAGE_FILE } from "./constants.js"
 
-export function capitalize(str) {
-  if (typeof str !== "string") return ""
-  return str[0].toUpperCase() + str.slice(1).toLowerCase()
-}
-
 export function loadLastMessage() {
   if (!fs.existsSync(LAST_MESSAGE_FILE)) return null
 
-  const lastMessage = JSON.parse(
-    fs.readFileSync(LAST_MESSAGE_FILE, "utf8").trim()
-  )
+  let lastMessage
+
+  try {
+    lastMessage = JSON.parse(fs.readFileSync(LAST_MESSAGE_FILE, "utf8").trim())
+  } catch {
+    // Битый файл всё равно бесполезен — удаляем, чтобы запуск не падал целиком
+    console.log("⚠️ Last message file is corrupted, removing it.")
+    deleteLastMessage()
+    return null
+  }
 
   if (lastMessage?.date) {
     const messageDay = new Date(lastMessage.date * 1000).toLocaleDateString(

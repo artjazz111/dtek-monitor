@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - "src/**"
+      - "test/**"
+      - "package.json"
+      - ".nvmrc"
+      - ".github/workflows/test.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      # Тесты не трогают сеть и браузер, поэтому зависимости не нужны
+      - name: Run tests
+        run: npm test
