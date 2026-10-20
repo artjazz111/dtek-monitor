@@ -8,7 +8,9 @@
     "start": "node --env-file=.env ./src/monitor.js",
     "watch": "node --env-file=.env --watch ./src/monitor.js",
     "test": "node --test \"test/**/*.test.js\"",
-    "test:watch": "node --test --watch \"test/**/*.test.js\"",
+    "test:unit": "node --test \"test/*.test.js\"",
+    "test:browser": "node --test \"test/browser/*.test.js\"",
+    "test:watch": "node --test --watch \"test/*.test.js\"",
     "test:coverage": "node --test --experimental-test-coverage \"test/**/*.test.js\""
   },
   "dependencies": {

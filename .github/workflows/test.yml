@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  unit:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +24,32 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      # Тесты не трогают сеть и браузер, поэтому зависимости не нужны
-      - name: Run tests
-        run: npm test
+      # Пакет playwright нужен для импорта monitor.js, но браузер не скачиваем
+      - name: Install dependencies
+        run: npm install
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+  browser:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npx playwright install chromium
+
+      # Запросы к ДТЕК перехвачены через page.route, но браузер настоящий
+      - name: Run browser tests
+        run: npm run test:browser
