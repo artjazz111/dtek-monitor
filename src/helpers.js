@@ -3,6 +3,12 @@ import path from "node:path"
 
 import { LAST_MESSAGE_FILE } from "./constants.js"
 
+// Telegram с parse_mode=HTML требует экранировать <, > и &. Без этого ответ
+// ДТЕК с амперсандом в названии ломает разбор, и сообщение не доходит вообще.
+export function escapeHtml(value) {
+  return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+}
+
 export function loadLastMessage() {
   if (!fs.existsSync(LAST_MESSAGE_FILE)) return null
 

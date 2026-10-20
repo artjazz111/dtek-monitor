@@ -8,7 +8,7 @@ import {
   GROUP,
 } from "./constants.js"
 
-import { deleteLastMessage, loadLastMessage, saveLastMessage } from "./helpers.js"
+import { deleteLastMessage, escapeHtml, loadLastMessage, saveLastMessage } from "./helpers.js"
 import { buildSchedule } from "./schedule.js"
 
 // Эти ошибки означают, что редактировать уже нечего — только здесь есть смысл
@@ -105,7 +105,7 @@ export async function sendNotification(message, outageInfo) {
 
 export async function sendTimeChangeNotification(newEndDate) {
   try {
-    const changeMessage = `⏰ <b>Змінено орієнтовний час відновлення:</b> до ${newEndDate}`
+    const changeMessage = `⏰ <b>Змінено орієнтовний час відновлення:</b> до ${escapeHtml(newEndDate)}`
 
     const response = await fetch(
       `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
