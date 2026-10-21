@@ -12,18 +12,18 @@ export function generateMessage(info, house = HOUSE) {
     "",
   ]
 
-  // Извлекаем детальную информацию об отключении для конкретного дома
+  // Витягуємо детальну інформацію про відключення для конкретного будинку
   if (info?.data && house) {
     const houseData = info.data[house]
     console.log("DEBUG houseData for", house, ":", JSON.stringify(houseData))
 
     if (houseData) {
-      // Причина отключения (тип)
+      // Причина відключення (тип)
       if (houseData.sub_type) {
         messageParts.push(`📋 <b>Причина:</b> ${escapeHtml(houseData.sub_type)}`)
       }
 
-      // Дополнительное описание причины
+      // Додатковий опис причини
       if (
         houseData.sub_type_reason &&
         Array.isArray(houseData.sub_type_reason) &&
@@ -35,12 +35,12 @@ export function generateMessage(info, house = HOUSE) {
         messageParts.push(`   <i>${reasons}</i>`)
       }
 
-      // Время начала отключения
+      // Час початку відключення
       if (houseData.start_date) {
         messageParts.push(`⏰ <b>Час початку:</b> ${escapeHtml(houseData.start_date)}`)
       }
 
-      // Ориентировочное время восстановления
+      // Орієнтовний час відновлення
       if (houseData.end_date) {
         messageParts.push(`🔌 <b>Орієнтовний час відновлення:</b> до ${escapeHtml(houseData.end_date)}`)
       }
@@ -49,7 +49,7 @@ export function generateMessage(info, house = HOUSE) {
     }
   }
 
-  // Дата обновления информации
+  // Дата оновлення інформації
   if (updateTimestamp) {
     messageParts.push(`🔄 <b>Дата оновлення:</b> ${escapeHtml(updateTimestamp)}`)
   }

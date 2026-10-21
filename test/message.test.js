@@ -23,26 +23,26 @@ after(() => restoreLogs())
 const outage = (overrides) => payload({ houses: { [HOUSE]: houseEntry(overrides) } })
 
 describe("escapeHtml", () => {
-  it("экранирует символы, ломающие разбор HTML в Telegram", () => {
+  it("екранує символи, що ламають розбір HTML у Telegram", () => {
     assert.equal(escapeHtml("ТП-5 & ТП-7"), "ТП-5 &amp; ТП-7")
     assert.equal(escapeHtml("<b>"), "&lt;b&gt;")
   })
 
-  it("экранирует все вхождения, а не только первое", () => {
+  it("екранує всі входження, а не лише перше", () => {
     assert.equal(escapeHtml("a & b & c"), "a &amp; b &amp; c")
   })
 
-  it("сначала заменяет амперсанд, чтобы не портить уже готовые сущности", () => {
+  it("спершу замінює амперсанд, щоб не псувати вже готові сутності", () => {
     assert.equal(escapeHtml("<&>"), "&lt;&amp;&gt;")
   })
 
-  it("не трогает обычный текст", () => {
+  it("не чіпає звичайний текст", () => {
     assert.equal(escapeHtml("Екстренні відключення"), "Екстренні відключення")
   })
 })
 
-describe("generateMessage: содержимое", () => {
-  it("собирает адрес, причину, очереди и время", () => {
+describe("generateMessage: вміст", () => {
+  it("збирає адресу, причину, черги і час", () => {
     const message = generateMessage(
       outage({
         sub_type: "Екстренні відключення",
@@ -62,7 +62,7 @@ describe("generateMessage: содержимое", () => {
     assert.match(message, /Час запиту:<\/b> \d{2}:\d{2} \d{2}\.\d{2}\.\d{4}/)
   })
 
-  it("пропускает блоки, которых нет в данных", () => {
+  it("пропускає блоки, яких немає в даних", () => {
     const message = generateMessage(outage({ sub_type: "Екстренні відключення" }), HOUSE)
 
     assert.match(message, /Причина:/)
@@ -71,26 +71,26 @@ describe("generateMessage: содержимое", () => {
     assert.doesNotMatch(message, /<i>/)
   })
 
-  it("не падает когда данных по дому нет", () => {
+  it("не падає коли даних по будинку немає", () => {
     const message = generateMessage(payload({ houses: {} }), HOUSE)
 
     assert.match(message, /Зафіксовано відключення/)
     assert.match(message, /Київ, вул\. Тестова, 7/)
   })
 
-  it("не падает на пустом ответе", () => {
+  it("не падає на порожній відповіді", () => {
     assert.match(generateMessage(null, HOUSE), /Зафіксовано відключення/)
     assert.match(generateMessage(undefined, HOUSE), /Зафіксовано відключення/)
   })
 
-  it("обходится без времени обновления", () => {
+  it("обходиться без часу оновлення", () => {
     const info = outage({ sub_type: "Екстренні відключення" })
     delete info.updateTimestamp
 
     assert.doesNotMatch(generateMessage(info, HOUSE), /Дата оновлення/)
   })
 
-  it("игнорирует sub_type_reason неожидаемого вида", () => {
+  it("ігнорує sub_type_reason неочікуваного вигляду", () => {
     const message = generateMessage(
       outage({ sub_type: "Екстренні відключення", sub_type_reason: "GPV26.1" }),
       HOUSE
@@ -100,9 +100,9 @@ describe("generateMessage: содержимое", () => {
   })
 })
 
-describe("generateMessage: экранирование", () => {
-  // Иначе Telegram отвечает 400 can't parse entities и сообщение не доходит
-  it("экранирует причину из ответа ДТЕК", () => {
+describe("generateMessage: екранування", () => {
+  // Інакше Telegram відповідає 400 can't parse entities і повідомлення не доходить
+  it("екранує причину з відповіді ДТЕК", () => {
     const message = generateMessage(
       outage({ sub_type: "Ремонт ТП-5 & ТП-7", start_date: "10:00" }),
       HOUSE
@@ -112,7 +112,7 @@ describe("generateMessage: экранирование", () => {
     assert.doesNotMatch(message, /ТП-5 & ТП-7/)
   })
 
-  it("экранирует даты из ответа ДТЕК", () => {
+  it("екранує дати з відповіді ДТЕК", () => {
     const message = generateMessage(
       outage({ sub_type: "Авария", start_date: "10:00 <br>", end_date: "14:00 & пізніше" }),
       HOUSE
@@ -122,7 +122,7 @@ describe("generateMessage: экранирование", () => {
     assert.match(message, /14:00 &amp; пізніше/)
   })
 
-  it("экранирует описание очередей", () => {
+  it("екранує опис черг", () => {
     const message = generateMessage(
       outage({ sub_type: "Авария", sub_type_reason: ["GPV26.1 & GPV29.1"] }),
       HOUSE
@@ -131,14 +131,14 @@ describe("generateMessage: экранирование", () => {
     assert.match(message, /Група 26\.1 &amp; Група 29\.1/)
   })
 
-  it("экранирует время обновления", () => {
+  it("екранує час оновлення", () => {
     const info = outage({ sub_type: "Авария" })
     info.updateTimestamp = "12:00 <script>"
 
     assert.match(generateMessage(info, HOUSE), /12:00 &lt;script&gt;/)
   })
 
-  it("оставляет собственную разметку сообщения нетронутой", () => {
+  it("залишає власну розмітку повідомлення недоторканою", () => {
     const message = generateMessage(outage({ sub_type: "Авария", start_date: "10:00" }), HOUSE)
 
     assert.match(message, /^⚡️ <b>Зафіксовано відключення:<\/b>/)

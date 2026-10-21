@@ -1,14 +1,14 @@
 import { HOUSE } from "./constants.js"
 
-// Ответ без data или с result:false — это сбой на стороне ДТЕК, а не отсутствие
-// отключения. Отличать их обязательно: иначе таймаут посреди отключения выглядит
-// как "свет есть" и сбрасывает сохранённое состояние.
+// Відповідь без data або з result:false — це збій на боці ДТЕК, а не відсутність
+// відключення. Відрізняти їх обов'язково: інакше таймаут посеред відключення
+// виглядає як "світло є" і скидає збережений стан.
 export function isDataUnavailable(info) {
   return !info || info.result === false || !info.data
 }
 
-// Данные пригодны к обработке только если в ответе есть наш дом. Иначе ничего не
-// трогаем: ложное "normal" в Home Assistant выглядит как снятая авария.
+// Дані придатні до обробки лише якщо у відповіді є наш будинок. Інакше нічого не
+// чіпаємо: хибне "normal" у Home Assistant виглядає як знята аварія.
 export function hasUsableData(info, house = HOUSE) {
   return !isDataUnavailable(info) && Boolean(house) && Boolean(info.data[house])
 }
@@ -28,7 +28,7 @@ export function checkIsOutage(info, house = HOUSE) {
 
   const houseData = info.data[house]
 
-  // Реальное отключение = когда sub_type не пустой И есть хотя бы одна дата
+  // Справжнє відключення = коли sub_type не порожній І є хоча б одна дата
   const hasOutage = Boolean(
     houseData.sub_type &&
       houseData.sub_type.trim() !== "" &&
@@ -44,12 +44,12 @@ export function checkIsScheduled(info, house = HOUSE) {
 
   if (isDataUnavailable(info)) return false
 
-  // Смотрим только на свой дом: данные соседних домов к нашему отключению отношения не имеют
+  // Дивимось лише на свій будинок: дані сусідніх будинків нашого відключення не стосуються
   if (!house || !info.data[house]) return false
 
   const houseData = info.data[house]
 
-  // type === "2" означает экстренное отключение (НЕ по графику)
+  // type === "2" означає екстрене відключення (НЕ за графіком)
   if (houseData.type === "2") {
     console.log("⚠️ Emergency power outage (not scheduled)!")
     return false
@@ -60,7 +60,7 @@ export function checkIsScheduled(info, house = HOUSE) {
     return false
   }
 
-  // Есть start_date/end_date и отключение не экстренное — значит плановое
+  // Є start_date/end_date і відключення не екстрене — отже планове
   if (houseData.start_date || houseData.end_date) {
     console.log("🗓️ Scheduled power outage!")
     return true

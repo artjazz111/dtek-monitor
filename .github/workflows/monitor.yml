@@ -50,7 +50,25 @@ jobs:
           GROUP: ${{ vars.GROUP }}
         run: node ./src/monitor.js
 
-      - name: Commit updated artifacts
+      # Payload і так лежить у логах запуску (DEBUG payload), тому вантажимо
+      # артефакти лише коли скрипт упав — заради last_error.txt і скриншота
+      - name: Upload debug artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dtek-debug-${{ github.run_id }}
+          path: |
+            artifacts/last_error.txt
+            artifacts/last_payload.json
+            artifacts/page.png
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # Комітимо тільки стан повідомлення Telegram: контейнер щоразу новий,
+      # тому без цього наступний запуск не знав би, що повідомлення вже є,
+      # і надсилав би нове замість редагування. Поза відключеннями файлу
+      # немає — отже й комітів немає.
+      - name: Commit Telegram message state
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -59,10 +77,10 @@ jobs:
 
           if ! git diff --cached --quiet; then
             LAST_COMMIT_MSG=$(git log -1 --pretty=%B || echo "")
-            if [ "$LAST_COMMIT_MSG" = "chore: update artifacts" ]; then
+            if [ "$LAST_COMMIT_MSG" = "chore: update message state" ]; then
               git commit --amend --no-edit
             else
-              git commit -m "chore: update artifacts"
+              git commit -m "chore: update message state"
             fi
             git push origin main --force-with-lease
           else

@@ -58,10 +58,10 @@ beforeEach(() => {
   fs.rmSync(LAST_MESSAGE_FILE, { force: true })
 })
 
-describe("handleInfo при негодных данных", () => {
-  // Таймаут или ошибка ДТЕК посреди отключения не означает, что свет дали.
-  // Если отправить в HA "normal", автоматизации решат, что авария снята.
-  it("ничего не делает при ошибочном ответе ДТЕК", async () => {
+describe("handleInfo при непридатних даних", () => {
+  // Таймаут чи помилка ДТЕК посеред відключення не означає, що світло дали.
+  // Якщо надіслати в HA "normal", автоматизації вирішать, що аварію знято.
+  it("нічого не робить при помилковій відповіді ДТЕК", async () => {
     saveLastMessage({ message_id: 500, date: nowSec(), outage_info: { start_date: "10:00" } })
     const calls = stubFetch()
 
@@ -71,7 +71,7 @@ describe("handleInfo при негодных данных", () => {
     assert.equal(fs.existsSync(LAST_MESSAGE_FILE), true)
   })
 
-  it("ничего не делает когда в ответе нет data", async () => {
+  it("нічого не робить коли у відповіді немає data", async () => {
     saveLastMessage({ message_id: 500, date: nowSec(), outage_info: { start_date: "10:00" } })
     const calls = stubFetch()
 
@@ -81,7 +81,7 @@ describe("handleInfo при негодных данных", () => {
     assert.equal(fs.existsSync(LAST_MESSAGE_FILE), true)
   })
 
-  it("ничего не делает когда нашего дома нет в данных", async () => {
+  it("нічого не робить коли нашого будинку немає в даних", async () => {
     saveLastMessage({ message_id: 500, date: nowSec(), outage_info: { start_date: "10:00" } })
     const calls = stubFetch()
 
@@ -92,8 +92,8 @@ describe("handleInfo при негодных данных", () => {
   })
 })
 
-describe("handleInfo без отключения", () => {
-  it("сообщает в HA 'normal' и сбрасывает состояние", async () => {
+describe("handleInfo без відключення", () => {
+  it("повідомляє в HA 'normal' і скидає стан", async () => {
     saveLastMessage({ message_id: 500, date: nowSec(), outage_info: { start_date: "10:00" } })
     const calls = stubFetch()
 
@@ -107,7 +107,7 @@ describe("handleInfo без отключения", () => {
   })
 })
 
-describe("handleInfo при аварийном отключении", () => {
+describe("handleInfo при аварійному відключенні", () => {
   const info = payload({
     houses: {
       [HOUSE]: houseEntry({
@@ -120,7 +120,7 @@ describe("handleInfo при аварийном отключении", () => {
     },
   })
 
-  it("пишет в Telegram и в HA", async () => {
+  it("пише в Telegram і в HA", async () => {
     const calls = stubFetch()
 
     await handleInfo(info)
@@ -130,7 +130,7 @@ describe("handleInfo при аварийном отключении", () => {
     assert.equal(haCalls(calls).length, 1)
   })
 
-  it("передаёт в HA состояние и детали отключения", async () => {
+  it("передає в HA стан і деталі відключення", async () => {
     const calls = stubFetch()
 
     await handleInfo(info)
@@ -146,7 +146,7 @@ describe("handleInfo при аварийном отключении", () => {
     })
   })
 
-  it("кладёт в сообщение адрес, причину и время", async () => {
+  it("кладе в повідомлення адресу, причину і час", async () => {
     const calls = stubFetch()
 
     await handleInfo(info)
@@ -156,21 +156,21 @@ describe("handleInfo при аварийном отключении", () => {
     assert.match(text, /Екстренні відключення/)
     assert.match(text, /10:00 20\.10\.2026/)
     assert.match(text, /14:00 20\.10\.2026/)
-    // GPV26.1 должно читаться как "Група 26.1"
+    // GPV26.1 має читатися як "Група 26.1"
     assert.match(text, /Група 26\.1/)
   })
 })
 
-describe("handleInfo когда Home Assistant недоступен", () => {
+describe("handleInfo коли Home Assistant недоступний", () => {
   const info = payload({ houses: { [HOUSE]: houseEntry() } })
 
-  it("не срывает запуск когда вебхук отвечает ошибкой", async () => {
+  it("не зриває запуск коли вебхук відповідає помилкою", async () => {
     globalThis.fetch = async () => ({ ok: false, status: 500, json: async () => ({}) })
 
     await assert.doesNotReject(() => handleInfo(info))
   })
 
-  it("не срывает запуск когда вебхук недостижим", async () => {
+  it("не зриває запуск коли вебхук недосяжний", async () => {
     globalThis.fetch = async () => {
       throw new Error("ECONNREFUSED")
     }
@@ -179,8 +179,8 @@ describe("handleInfo когда Home Assistant недоступен", () => {
   })
 })
 
-describe("handleInfo при плановом отключении", () => {
-  it("не пишет в Telegram, но сообщает в HA 'normal'", async () => {
+describe("handleInfo при плановому відключенні", () => {
+  it("не пише в Telegram, але повідомляє в HA 'normal'", async () => {
     const calls = stubFetch()
 
     await handleInfo(

@@ -11,8 +11,8 @@ import {
 import { deleteLastMessage, escapeHtml, loadLastMessage, saveLastMessage } from "./helpers.js"
 import { buildSchedule } from "./schedule.js"
 
-// Эти ошибки означают, что редактировать уже нечего — только здесь есть смысл
-// сбрасывать сохранённое состояние
+// Ці помилки означають, що редагувати вже нічого — лише тут є сенс
+// скидати збережений стан
 const STALE_MESSAGE_ERRORS = [
   "message to edit not found",
   "message to be edited not found",
@@ -20,7 +20,7 @@ const STALE_MESSAGE_ERRORS = [
   "message_id_invalid",
 ]
 
-// Текст совпал с уже отправленным — для нас это не ошибка
+// Текст збігся з уже надісланим — для нас це не помилка
 const NOT_MODIFIED_ERROR = "message is not modified"
 
 export async function sendNotification(message, outageInfo) {
@@ -35,16 +35,16 @@ export async function sendNotification(message, outageInfo) {
   const lastMessage = loadLastMessage() || {}
   const lastOutageInfo = lastMessage.outage_info || {}
 
-  // Определяем тип уведомления
+  // Визначаємо тип повідомлення
   let isNewOutage = false
   let endDateChanged = false
 
   if (lastMessage.message_id && outageInfo) {
-    // Проверяем: это новое отключение или продолжение текущего
+    // Перевіряємо: це нове відключення чи продовження поточного
     if (lastOutageInfo.start_date !== outageInfo.start_date) {
       console.log("🆕 Detected new outage (different start_date)")
       isNewOutage = true
-      deleteLastMessage() // Удаляем старую информацию, создадим новое сообщение
+      deleteLastMessage() // Видаляємо старі дані, створимо нове повідомлення
     } else if (lastOutageInfo.end_date !== outageInfo.end_date && outageInfo.end_date) {
       console.log("⏰ End time changed:", lastOutageInfo.end_date, "→", outageInfo.end_date)
       endDateChanged = true
@@ -64,7 +64,7 @@ export async function sendNotification(message, outageInfo) {
           chat_id: TELEGRAM_CHAT_ID,
           text: message,
           parse_mode: "HTML",
-          // message_id нужен только при редактировании
+          // message_id потрібен лише при редагуванні
           message_id: isEdit ? lastMessage.message_id : undefined,
         }),
       }
@@ -75,11 +75,11 @@ export async function sendNotification(message, outageInfo) {
 
     saveLastMessage({
       ...data.result,
-      outage_info: outageInfo, // Сохраняем информацию об отключении
+      outage_info: outageInfo, // Зберігаємо інформацію про відключення
     })
     console.log("🟢 Notification sent.")
 
-    // Если изменилось время восстановления - отправляем дополнительное уведомление
+    // Якщо змінився час відновлення — надсилаємо додаткове повідомлення
     if (endDateChanged && outageInfo.end_date) {
       console.log("📤 Sending additional notification about end time change...")
       await sendTimeChangeNotification(outageInfo.end_date)
@@ -94,8 +94,8 @@ export async function sendNotification(message, outageInfo) {
 
     console.log("🔴 Notification not sent.", error.message)
 
-    // Сбрасываем состояние только если сообщения в чате больше нет. При временной
-    // ошибке Telegram состояние надо сохранить, иначе следующий запуск отправит дубль
+    // Скидаємо стан лише якщо повідомлення в чаті більше немає. При тимчасовій
+    // помилці Telegram стан треба зберегти, інакше наступний запуск надішле дубль
     if (STALE_MESSAGE_ERRORS.some((text) => description.includes(text))) {
       console.log("🧹 Saved message is gone, resetting state.")
       deleteLastMessage()

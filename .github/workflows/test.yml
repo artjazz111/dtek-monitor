@@ -24,7 +24,7 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      # Пакет playwright нужен для импорта monitor.js, но браузер не скачиваем
+      # Пакет playwright потрібен для імпорту monitor.js, але браузер не завантажуємо
       - name: Install dependencies
         run: npm install
         env:
@@ -50,6 +50,6 @@ jobs:
           npm install
           npx playwright install chromium
 
-      # Запросы к ДТЕК перехвачены через page.route, но браузер настоящий
+      # Запити до ДТЕК перехоплені через page.route, але браузер справжній
       - name: Run browser tests
         run: npm run test:browser

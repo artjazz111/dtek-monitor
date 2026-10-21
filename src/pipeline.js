@@ -9,8 +9,8 @@ import { deleteLastMessage } from "./helpers.js"
 import { generateMessage } from "./message.js"
 import { sendNotification, sendToHomeAssistant } from "./notifications.js"
 
-// Решает, что делать с ответом ДТЕК. Вынесено из monitor.js, чтобы логику можно
-// было проверять без запуска браузера.
+// Вирішує, що робити з відповіддю ДТЕК. Винесено з monitor.js, щоб логіку можна
+// було перевіряти без запуску браузера.
 export async function handleInfo(info) {
   // Збій сайту або немає даних по будинку — не шлемо в HA "normal",
   // інакше HA вирішить, що ДТЕК зняв аварію, а наступний запуск дасть "нову"
@@ -28,14 +28,14 @@ export async function handleInfo(info) {
 
     await sendNotification(message, outageInfo)
 
-    // Отправляем данные в Home Assistant
+    // Надсилаємо дані в Home Assistant
     await sendToHomeAssistant(outageInfo, true, info)
   } else {
     console.log("ℹ️ No notification needed.")
-    // Удаляем информацию о последнем сообщении когда отключения нет
+    // Видаляємо дані про останнє повідомлення, коли відключення немає
     deleteLastMessage()
 
-    // Уведомляем Home Assistant что отключения нет
+    // Повідомляємо Home Assistant, що відключення немає
     await sendToHomeAssistant(null, false, info)
   }
 }
