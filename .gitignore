@@ -1,2 +1,8 @@
 node_modules
 .env
+
+# Дебаг-артефакти перезаписуються щозапуску — у git їм нічого робити.
+# last-message.json це виняток: у ньому стан повідомлення Telegram, і він
+# мусить переживати запуски, бо контейнер GitHub Actions щоразу новий.
+artifacts/*
+!artifacts/last-message.json

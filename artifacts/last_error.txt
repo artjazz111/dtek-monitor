@@ -1,6 +1,0 @@
-page.waitForSelector: Timeout 15000ms exceeded.
-Call log:
-  - waiting for locator('meta[name="csrf-token"]')
-
-    at getInfo (/home/runner/work/dtek-monitor/dtek-monitor/src/monitor.js:53:37)
-    at async run (/home/runner/work/dtek-monitor/dtek-monitor/src/monitor.js:408:16)
