@@ -1,5 +1,5 @@
-// Тесты скрейпинга. Браузер настоящий, но запросы к ДТЕК перехвачены
-// через page.route, так что сеть не нужна.
+// Тести скрейпінгу. Браузер справжній, але запити до ДТЕК перехоплені
+// через page.route, тож мережа не потрібна.
 import { after, afterEach, before, beforeEach, describe, it } from "node:test"
 import assert from "node:assert/strict"
 import fs from "node:fs"
@@ -49,8 +49,8 @@ afterEach(async () => {
   await page?.close()
 })
 
-// Отдаёт страницу с csrf-токеном и подменяет ответ /ua/ajax.
-// Возвращает массив перехваченных POST-запросов.
+// Віддає сторінку з csrf-токеном і підміняє відповідь /ua/ajax.
+// Повертає масив перехоплених POST-запитів.
 async function routeDtek({ html = pageHtml(), ajax } = {}) {
   const requests = []
 
@@ -81,11 +81,11 @@ async function routeDtek({ html = pageHtml(), ajax } = {}) {
 
 const artifact = (name) => path.join(artifactsDir, name)
 
-// Ждать продакшн-таймауты в тестах незачем
+// Чекати продакшн-таймаути в тестах нема сенсу
 const FAST = { navigationTimeout: 5000, settleMs: 0, selectorTimeout: 500 }
 
-describe("fetchShutdowns: запрос к ДТЕК", () => {
-  it("отдаёт payload из ответа", async () => {
+describe("fetchShutdowns: запит до ДТЕК", () => {
+  it("віддає payload з відповіді", async () => {
     await routeDtek({
       ajax: {
         status: 200,
@@ -104,7 +104,7 @@ describe("fetchShutdowns: запрос к ДТЕК", () => {
     assert.equal(info.data["7"].sub_type, "Екстренні відключення")
   })
 
-  it("берёт csrf-токен со страницы и кладёт в заголовок", async () => {
+  it("бере csrf-токен зі сторінки і кладе в заголовок", async () => {
     const requests = await routeDtek({ html: pageHtml("csrf-from-page") })
 
     await fetchShutdowns(page, FAST)
@@ -114,7 +114,7 @@ describe("fetchShutdowns: запрос к ДТЕК", () => {
     assert.equal(requests[0].headers["x-requested-with"], "XMLHttpRequest")
   })
 
-  it("отправляет адрес в формате, который ждёт ДТЕК", async () => {
+  it("надсилає адресу у форматі, якого чекає ДТЕК", async () => {
     const requests = await routeDtek()
 
     await fetchShutdowns(page, FAST)
@@ -130,7 +130,7 @@ describe("fetchShutdowns: запрос к ДТЕК", () => {
     assert.ok(body.get("data[2][value]"))
   })
 
-  it("сохраняет график fact, если он есть в ответе", async () => {
+  it("зберігає графік fact, якщо він є у відповіді", async () => {
     await routeDtek({
       ajax: {
         status: 200,
@@ -155,8 +155,8 @@ describe("fetchShutdowns: запрос к ДТЕК", () => {
   })
 })
 
-describe("fetchShutdowns: timestamp обновления", () => {
-  it("подставляет своё время когда ДТЕК его не прислал", async () => {
+describe("fetchShutdowns: timestamp оновлення", () => {
+  it("підставляє свій час коли ДТЕК його не надіслав", async () => {
     await routeDtek({
       ajax: {
         status: 200,
@@ -170,7 +170,7 @@ describe("fetchShutdowns: timestamp обновления", () => {
     assert.match(info.updateTimestamp, /^\d{2}:\d{2} \d{2}\.\d{2}\.\d{4}$/)
   })
 
-  it("не перебивает timestamp, присланный ДТЕК", async () => {
+  it("не перебиває timestamp, надісланий ДТЕК", async () => {
     await routeDtek({
       ajax: {
         status: 200,
@@ -189,9 +189,9 @@ describe("fetchShutdowns: timestamp обновления", () => {
   })
 })
 
-describe("fetchShutdowns: плохие ответы", () => {
-  // ДТЕК периодически отдаёт HTML-заглушку вместо JSON
-  it("не падает когда вместо JSON пришёл HTML", async () => {
+describe("fetchShutdowns: погані відповіді", () => {
+  // ДТЕК періодично віддає HTML-заглушку замість JSON
+  it("не падає коли замість JSON прийшов HTML", async () => {
     await routeDtek({
       ajax: { status: 200, contentType: "text/html", body: "<html>502 Bad Gateway</html>" },
     })
@@ -202,7 +202,7 @@ describe("fetchShutdowns: плохие ответы", () => {
     assert.match(info.text, /502 Bad Gateway/)
   })
 
-  it("обрезает слишком длинный не-JSON ответ", async () => {
+  it("обрізає надто довгу не-JSON відповідь", async () => {
     await routeDtek({
       ajax: { status: 200, contentType: "text/html", body: "x".repeat(5000) },
     })
@@ -212,7 +212,7 @@ describe("fetchShutdowns: плохие ответы", () => {
     assert.equal(info.text.length, 2000)
   })
 
-  it("возвращает ошибочный payload как есть", async () => {
+  it("повертає помилковий payload як є", async () => {
     await routeDtek({
       ajax: {
         status: 200,
@@ -226,7 +226,7 @@ describe("fetchShutdowns: плохие ответы", () => {
     assert.equal(info.result, false)
   })
 
-  it("переживает ответ с HTTP-ошибкой", async () => {
+  it("переживає відповідь з HTTP-помилкою", async () => {
     await routeDtek({
       ajax: {
         status: 500,
@@ -241,8 +241,8 @@ describe("fetchShutdowns: плохие ответы", () => {
   })
 })
 
-describe("fetchShutdowns: артефакты", () => {
-  it("пишет ответ в last_payload.json вместе с отправленным адресом", async () => {
+describe("fetchShutdowns: артефакти", () => {
+  it("пише відповідь у last_payload.json разом з надісланою адресою", async () => {
     await routeDtek()
 
     await fetchShutdowns(page, FAST)
@@ -254,7 +254,7 @@ describe("fetchShutdowns: артефакты", () => {
     assert.equal(saved.payload.result, true)
   })
 
-  it("делает скриншот когда ДТЕК вернул result:false", async () => {
+  it("робить скриншот коли ДТЕК повернув result:false", async () => {
     await routeDtek({
       ajax: {
         status: 200,
@@ -268,7 +268,7 @@ describe("fetchShutdowns: артефакты", () => {
     assert.equal(fs.existsSync(artifact("page.png")), true)
   })
 
-  it("не делает скриншот когда ответ нормальный", async () => {
+  it("не робить скриншот коли відповідь нормальна", async () => {
     await routeDtek()
 
     await fetchShutdowns(page, FAST)
@@ -277,14 +277,14 @@ describe("fetchShutdowns: артефакты", () => {
   })
 })
 
-describe("fetchShutdowns: сбои страницы", () => {
-  it("бросает ошибку когда страница недоступна", async () => {
+describe("fetchShutdowns: збої сторінки", () => {
+  it("кидає помилку коли сторінка недоступна", async () => {
     await page.route(SHUTDOWNS_PAGE, (route) => route.abort("connectionrefused"))
 
     await assert.rejects(() => fetchShutdowns(page, FAST))
   })
 
-  it("бросает ошибку когда на странице нет csrf-токена", async () => {
+  it("кидає помилку коли на сторінці немає csrf-токена", async () => {
     await page.route(SHUTDOWNS_PAGE, (route) =>
       route.fulfill({
         status: 200,

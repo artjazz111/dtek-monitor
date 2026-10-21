@@ -19,16 +19,16 @@ async function writeArtifact(name, content) {
   return filePath;
 }
 
-// Работа со страницей отдельно от запуска браузера: в тестах сюда передаётся
-// page с перехваченными запросами (page.route), без обращений к ДТЕК.
-// Таймауты вынесены в параметры, чтобы тесты не ждали их целиком.
+// Робота зі сторінкою окремо від запуску браузера: у тестах сюди передається
+// page з перехопленими запитами (page.route), без звернень до ДТЕК.
+// Таймаути винесені в параметри, щоб тести не чекали їх цілком.
 export async function fetchShutdowns(
   page,
   { navigationTimeout = 30000, settleMs = 2000, selectorTimeout = 15000 } = {}
 ) {
   await page.goto(SHUTDOWNS_PAGE, { waitUntil: "networkidle", timeout: navigationTimeout });
 
-  // Дождемся стабилизации страницы
+  // Дочекаємось стабілізації сторінки
   await page.waitForTimeout(settleMs);
 
   const csrfTokenTag = await page.waitForSelector('meta[name="csrf-token"]', {
@@ -97,12 +97,12 @@ export async function fetchShutdowns(
 
   await writeArtifact("last_payload.json", JSON.stringify(result, null, 2));
 
-  // Добавляем timestamp текущего обновления если его нет в ответе API
+  // Додаємо timestamp поточного оновлення, якщо його немає у відповіді API
   if (result.payload && !result.payload.updateTimestamp) {
     result.payload.updateTimestamp = getCurrentTime();
   }
 
-  // Если сервер всё равно вернул Error — делаем скрин для понимания, что на странице
+  // Якщо сервер усе одно повернув Error — робимо скрин, щоб зрозуміти, що на сторінці
   if (result?.payload?.result === false) {
     await ensureArtifactsDir();
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, "page.png"), fullPage: true });
@@ -113,8 +113,8 @@ export async function fetchShutdowns(
   return result.payload;
 }
 
-// launchBrowser подменяется в тестах, чтобы проверить запись last_error.txt
-// без настоящего браузера
+// launchBrowser підмінюється в тестах, щоб перевірити запис last_error.txt
+// без справжнього браузера
 export async function getInfo({ launchBrowser = () => chromium.launch({ headless: true }) } = {}) {
   console.log("🌀 Getting info...");
   console.log("DEBUG SHUTDOWNS_PAGE:", SHUTDOWNS_PAGE);
@@ -126,7 +126,7 @@ export async function getInfo({ launchBrowser = () => chromium.launch({ headless
   try {
     return await fetchShutdowns(page);
   } catch (error) {
-    // фиксируем ошибку в артефакт
+    // фіксуємо помилку в артефакт
     await writeArtifact("last_error.txt", String(error?.stack || error?.message || error));
     throw Error(`❌ Getting info failed: ${error.message}`);
   } finally {
@@ -139,7 +139,7 @@ export async function run() {
   await handleInfo(info);
 }
 
-// Запускаем только при прямом вызове, чтобы модуль можно было импортировать в тестах
+// Запускаємо лише при прямому виклику, щоб модуль можна було імпортувати в тестах
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   run().catch((error) => console.error(error.message));
 }

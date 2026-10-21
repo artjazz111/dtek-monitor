@@ -22,88 +22,88 @@ before(() => {
 after(() => restoreLogs())
 
 describe("isDataUnavailable", () => {
-  it("распознаёт ошибочный ответ ДТЕК", () => {
+  it("розпізнає помилкову відповідь ДТЕК", () => {
     assert.equal(isDataUnavailable({ result: false, text: "Error" }), true)
   })
 
-  it("распознаёт ответ без data", () => {
+  it("розпізнає відповідь без data", () => {
     assert.equal(isDataUnavailable({ result: true }), true)
   })
 
-  it("распознаёт пустой ответ", () => {
+  it("розпізнає порожню відповідь", () => {
     assert.equal(isDataUnavailable(null), true)
     assert.equal(isDataUnavailable(undefined), true)
   })
 
-  it("пропускает нормальный ответ", () => {
+  it("пропускає нормальну відповідь", () => {
     assert.equal(isDataUnavailable(payload({ houses: { [HOUSE]: houseEntry() } })), false)
   })
 })
 
 describe("hasUsableData", () => {
-  it("требует наличия нашего дома в ответе", () => {
+  it("вимагає наявності нашого будинку у відповіді", () => {
     const info = payload({ houses: { 9: houseEntry() } })
     assert.equal(hasUsableData(info, HOUSE), false)
   })
 
-  it("требует настроенного номера дома", () => {
+  it("вимагає налаштованого номера будинку", () => {
     const info = payload({ houses: { [HOUSE]: houseEntry() } })
     assert.equal(hasUsableData(info, ""), false)
     assert.equal(hasUsableData(info, undefined), false)
   })
 
-  it("принимает ответ с нашим домом", () => {
+  it("приймає відповідь з нашим будинком", () => {
     const info = payload({ houses: { [HOUSE]: houseEntry() } })
     assert.equal(hasUsableData(info, HOUSE), true)
   })
 })
 
 describe("checkIsOutage", () => {
-  it("не считает ошибку ДТЕК отключением", () => {
+  it("не вважає помилку ДТЕК відключенням", () => {
     assert.equal(checkIsOutage({ result: false, text: "Error" }, HOUSE), false)
   })
 
-  it("возвращает false если нашего дома нет в данных", () => {
+  it("повертає false якщо нашого будинку немає в даних", () => {
     const info = payload({ houses: { 9: houseEntry({ sub_type: "Екстренні", start_date: "10:00" }) } })
     assert.equal(checkIsOutage(info, HOUSE), false)
   })
 
-  it("возвращает false когда причина пустая", () => {
+  it("повертає false коли причина порожня", () => {
     const info = payload({
       houses: { [HOUSE]: houseEntry({ start_date: "10:00", end_date: "14:00" }) },
     })
     assert.equal(checkIsOutage(info, HOUSE), false)
   })
 
-  it("возвращает false когда причина из одних пробелов", () => {
+  it("повертає false коли причина з одних пробілів", () => {
     const info = payload({
       houses: { [HOUSE]: houseEntry({ sub_type: "   ", start_date: "10:00" }) },
     })
     assert.equal(checkIsOutage(info, HOUSE), false)
   })
 
-  it("возвращает false когда причина есть, а дат нет", () => {
+  it("повертає false коли причина є, а дат немає", () => {
     const info = payload({
       houses: { [HOUSE]: houseEntry({ sub_type: "Екстренні відключення" }) },
     })
     assert.equal(checkIsOutage(info, HOUSE), false)
   })
 
-  it("находит отключение по причине и дате начала", () => {
+  it("знаходить відключення за причиною і датою початку", () => {
     const info = payload({
       houses: { [HOUSE]: houseEntry({ sub_type: "Екстренні відключення", start_date: "10:00" }) },
     })
     assert.equal(checkIsOutage(info, HOUSE), true)
   })
 
-  it("находит отключение когда известна только дата окончания", () => {
+  it("знаходить відключення коли відома лише дата закінчення", () => {
     const info = payload({
       houses: { [HOUSE]: houseEntry({ sub_type: "Екстренні відключення", end_date: "14:00" }) },
     })
     assert.equal(checkIsOutage(info, HOUSE), true)
   })
 
-  it("всегда возвращает boolean, а не строку из данных", () => {
+  it("завжди повертає boolean, а не рядок з даних", () => {
     const info = payload({
       houses: { [HOUSE]: houseEntry({ sub_type: "Екстренні", start_date: "10:00" }) },
     })
@@ -113,7 +113,7 @@ describe("checkIsOutage", () => {
 })
 
 describe("checkIsScheduled", () => {
-  it("не считает плановым аварийное отключение по type=2", () => {
+  it("не вважає плановим аварійне відключення за type=2", () => {
     const info = payload({
       houses: {
         [HOUSE]: houseEntry({
@@ -126,7 +126,7 @@ describe("checkIsScheduled", () => {
     assert.equal(checkIsScheduled(info, HOUSE), false)
   })
 
-  it("не считает плановым отключение с 'екстренні' в причине", () => {
+  it("не вважає плановим відключення з 'екстренні' у причині", () => {
     const info = payload({
       houses: {
         [HOUSE]: houseEntry({ sub_type: "Екстренні відключення", start_date: "10:00" }),
@@ -135,7 +135,7 @@ describe("checkIsScheduled", () => {
     assert.equal(checkIsScheduled(info, HOUSE), false)
   })
 
-  it("считает плановым отключение с датами и неаварийным типом", () => {
+  it("вважає плановим відключення з датами і неаварійним типом", () => {
     const info = payload({
       houses: {
         [HOUSE]: houseEntry({
@@ -149,16 +149,16 @@ describe("checkIsScheduled", () => {
     assert.equal(checkIsScheduled(info, HOUSE), true)
   })
 
-  it("возвращает false когда дат нет", () => {
+  it("повертає false коли дат немає", () => {
     const info = payload({
       houses: { [HOUSE]: houseEntry({ sub_type: "Відключення за графіком" }) },
     })
     assert.equal(checkIsScheduled(info, HOUSE), false)
   })
 
-  // Раньше была ветка, которая искала "екстренні"/"графік" по JSON всего ответа —
-  // то есть по всем ~100 домам улицы. Решение должно зависеть только от своего дома.
-  it("игнорирует аварию у соседнего дома", () => {
+  // Раніше була гілка, яка шукала "екстренні"/"графік" по JSON усієї відповіді —
+  // тобто по всіх ~100 будинках вулиці. Рішення має залежати лише від свого будинку.
+  it("ігнорує аварію в сусіднього будинку", () => {
     const info = payload({
       houses: {
         [HOUSE]: houseEntry({
@@ -172,7 +172,7 @@ describe("checkIsScheduled", () => {
     assert.equal(checkIsScheduled(info, HOUSE), true)
   })
 
-  it("игнорирует график у соседнего дома", () => {
+  it("ігнорує графік у сусіднього будинку", () => {
     const info = payload({
       houses: {
         [HOUSE]: houseEntry(),
@@ -184,12 +184,12 @@ describe("checkIsScheduled", () => {
 })
 
 describe("extractOutageInfo", () => {
-  it("возвращает null когда данных по дому нет", () => {
+  it("повертає null коли даних по будинку немає", () => {
     assert.equal(extractOutageInfo(payload({ houses: {} }), HOUSE), null)
     assert.equal(extractOutageInfo({ result: false }, HOUSE), null)
   })
 
-  it("забирает только поля, нужные для сравнения отключений", () => {
+  it("забирає лише поля, потрібні для порівняння відключень", () => {
     const info = payload({
       houses: {
         [HOUSE]: houseEntry({
@@ -208,7 +208,7 @@ describe("extractOutageInfo", () => {
     })
   })
 
-  it("подставляет пустые строки вместо отсутствующих полей", () => {
+  it("підставляє порожні рядки замість відсутніх полів", () => {
     const info = payload({ houses: { [HOUSE]: {} } })
 
     assert.deepEqual(extractOutageInfo(info, HOUSE), {

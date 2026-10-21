@@ -1,4 +1,4 @@
-// Фабрики тестовых данных в формате ответа ДТЕК (/ua/ajax, method=getHomeNum)
+// Фабрики тестових даних у форматі відповіді ДТЕК (/ua/ajax, method=getHomeNum)
 
 export function houseEntry(overrides = {}) {
   return {
@@ -22,8 +22,8 @@ export function payload({ houses = {}, ...rest } = {}) {
   }
 }
 
-// Строка часов 1..24 для одной очереди. Час h — это промежуток (h-1):00–h:00
-// по Киеву, по умолчанию свет есть.
+// Рядок годин 1..24 для однієї черги. Година h — це проміжок (h-1):00–h:00
+// за Києвом, за замовчуванням світло є.
 export function factRow(hours = {}) {
   const row = {}
 

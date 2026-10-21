@@ -3,8 +3,8 @@ import path from "node:path"
 
 import { LAST_MESSAGE_FILE } from "./constants.js"
 
-// Telegram с parse_mode=HTML требует экранировать <, > и &. Без этого ответ
-// ДТЕК с амперсандом в названии ломает разбор, и сообщение не доходит вообще.
+// Telegram з parse_mode=HTML вимагає екранувати <, > і &. Без цього відповідь
+// ДТЕК з амперсандом у назві ламає розбір, і повідомлення не доходить взагалі.
 export function escapeHtml(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
 }
@@ -17,7 +17,7 @@ export function loadLastMessage() {
   try {
     lastMessage = JSON.parse(fs.readFileSync(LAST_MESSAGE_FILE, "utf8").trim())
   } catch {
-    // Битый файл всё равно бесполезен — удаляем, чтобы запуск не падал целиком
+    // Битий файл усе одно непотрібний — видаляємо, щоб запуск не падав цілком
     console.log("⚠️ Last message file is corrupted, removing it.")
     deleteLastMessage()
     return null
@@ -48,7 +48,7 @@ export function saveLastMessage({ date, message_id, outage_info } = {}) {
     JSON.stringify({
       message_id,
       date,
-      outage_info, // Сохраняем информацию об отключении (start_date, end_date, sub_type)
+      outage_info, // Зберігаємо інформацію про відключення (start_date, end_date, sub_type)
     })
   )
 }
