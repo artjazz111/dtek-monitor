@@ -6,6 +6,8 @@ import {
   HOUSE,
   HA_WEBHOOK_URL,
   GROUP,
+  SITE_URL,
+  SITE_TOKEN,
 } from "./constants.js"
 
 import { deleteLastMessage, escapeHtml, loadLastMessage, saveLastMessage } from "./helpers.js"
@@ -129,7 +131,34 @@ export async function sendTimeChangeNotification(newEndDate) {
   }
 }
 
+// Сайт будинку (liko46.pages.dev): лише стан аварії й час, без графіка. Збій сайту не заважає HA.
+async function sendToSite(outageInfo, isActive) {
+  if (!SITE_URL || !SITE_TOKEN) return
+
+  try {
+    const response = await fetch(SITE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${SITE_TOKEN}` },
+      body: JSON.stringify({
+        state: isActive ? "outage" : "normal",
+        ...(outageInfo && {
+          outage: {
+            start_date: outageInfo.start_date,
+            end_date: outageInfo.end_date,
+            reason: outageInfo.sub_type,
+          },
+        }),
+      }),
+    })
+    console.log(response.ok ? "🟢 Data sent to site." : `🔴 Failed to send to site: ${response.status}`)
+  } catch (error) {
+    console.log("🔴 Error sending to site:", error.message)
+  }
+}
+
 export async function sendToHomeAssistant(outageInfo, isActive, info) {
+  await sendToSite(outageInfo, isActive)
+
   if (!HA_WEBHOOK_URL) {
     console.log("ℹ️ HA_WEBHOOK_URL not configured, skipping Home Assistant notification")
     return
