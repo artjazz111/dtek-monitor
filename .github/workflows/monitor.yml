@@ -48,6 +48,8 @@ jobs:
           HOUSE: ${{ secrets.HOUSE }}
           HA_WEBHOOK_URL: ${{ secrets.HA_WEBHOOK_URL }}
           GROUP: ${{ vars.GROUP }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          SITE_TOKEN: ${{ secrets.SITE_TOKEN }}
         run: node ./src/monitor.js
 
       # Payload і так лежить у логах запуску (DEBUG payload), тому вантажимо
